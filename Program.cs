@@ -6,10 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-// 👇 הוספת נתיב לספרייה שבה נמצא הקובץ pdfium.dll
-var pdfiumPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+// ✅ הוספת נתיב שבו נמצא pdfium.dll (בתיקיית הבסיס של Azure)
 Environment.SetEnvironmentVariable("PATH",
-    Environment.GetEnvironmentVariable("PATH") + ";" + pdfiumPath);
+    Environment.GetEnvironmentVariable("PATH") + ";" + Directory.GetCurrentDirectory());
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,7 +96,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
