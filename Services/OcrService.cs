@@ -16,16 +16,43 @@ namespace BusuMatchProject.Services
 
             if (ext == ".pdf")
             {
-                // Convert PDF to image (first page only)
-                var image = PdfHelper.ConvertPdfToBitmap(path);
+                // Use pdftoppm to convert PDF to images
+                string tempOutputPrefix = Path.Combine(Path.GetTempPath(), "output");
 
-                // Convert to Bitmap if needed
-                if (image is not Bitmap bitmap)
-                    throw new InvalidCastException("Image could not be cast to Bitmap.");
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "pdftoppm",
+                    Arguments = $"-jpeg \"{path}\" \"{tempOutputPrefix}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-                var preprocessed = PreprocessImage(bitmap);
-                return RunOcrOnBitmap(preprocessed);
+                var process = System.Diagnostics.Process.Start(startInfo);
+                process.WaitForExit();
+
+                // Get generated images
+                var images = Directory.GetFiles(Path.GetTempPath(), "output-*.jpg");
+                if (images.Length == 0)
+                    throw new Exception("Failed to convert PDF to images");
+
+                var extractedText = new List<string>();
+
+                foreach (var imgPath in images)
+                {
+                    using var bitmap = new Bitmap(imgPath);
+                    var preprocessed = PreprocessImage(bitmap);
+                    var text = RunOcrOnBitmap(preprocessed);
+                    extractedText.Add(text);
+
+                    // Optionally delete the temp image
+                    File.Delete(imgPath);
+                }
+
+                return string.Join("\n", extractedText);
             }
+
             else
             {
                 var image = new Bitmap(path);

@@ -16,4 +16,3 @@ build/
 ## Ignore secrets
 appsettings.Development.json
 .env
-*.db

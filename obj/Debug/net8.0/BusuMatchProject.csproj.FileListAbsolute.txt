@@ -210,3 +210,4 @@ C:\Users\shir3\source\repos\BusuMatchProject\BusuMatchProject\bin\Debug\net8.0\r
 C:\Users\shir3\source\repos\BusuMatchProject\BusuMatchProject\bin\Debug\net8.0\runtimes\win-x86\native\vcruntime140.dll
 C:\Users\shir3\source\repos\BusuMatchProject\BusuMatchProject\bin\Debug\net8.0\Resources\category_keywords.json
 C:\Users\shir3\source\repos\BusuMatchProject\BusuMatchProject\bin\Debug\net8.0\x64\pdfium.dll
+C:\Users\shir3\source\repos\BusuMatchProject\BusuMatchProject\obj\Debug\net8.0\BusuMatchProject.sourcelink.json
