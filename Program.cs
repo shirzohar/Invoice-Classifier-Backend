@@ -6,11 +6,22 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
-Environment.SetEnvironmentVariable("PATH",
-    Environment.GetEnvironmentVariable("PATH") + ";C:\\home\\site\\wwwroot");
+// ✅ תיקון בטוח להגדרת PATH
+try
+{
+    var currentPath = Environment.GetEnvironmentVariable("PATH") ?? "";
+    var extendedPath = currentPath + ";C:\\home\\site\\wwwroot";
+    Environment.SetEnvironmentVariable("PATH", extendedPath);
+    Console.WriteLine("✅ PATH updated successfully.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("⚠️ Failed to update PATH: " + ex.Message);
+}
 
 // 🔐 JWT Config
+var builder = WebApplication.CreateBuilder(args);
+
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -35,7 +46,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ CORS: לאפשר גם ל־localhost וגם ל־Render
+// ✅ CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -87,7 +98,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// ✅ הפעלת CORS – בשלב מוקדם
+// ✅ CORS מוקדם
 app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
