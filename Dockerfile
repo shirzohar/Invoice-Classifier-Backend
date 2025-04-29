@@ -8,10 +8,11 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
+# מעתיקים את תוצרי הבנייה והמסד
 COPY --from=build /app/out .
 COPY users.db .
 
-# 📦 מתקינים תלויות
+# 📦 מתקינים תלויות (כולל OCR ותמיכה בלינוקס)
 RUN apt-get update && \
     apt-get install -y \
     libgdiplus \
@@ -23,12 +24,12 @@ RUN apt-get update && \
     tesseract-ocr-heb \
     poppler-utils \
     ghostscript && \
-    # 🛠 תיקון הקריסה של libleptonica
-    ln -s /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/libleptonica-1.80.0.so || true && \
+    # ✅ יצירת symlink כדי ש-Tesseract ימצא את הספריה הנכונה
+    ln -s /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/libleptonica-1.80.0.so && \
     apt-get clean
 
-# 📌 תמיכה ב-System.Drawing
+# 📌 חובה ללינוקס: תמיכה ב־System.Drawing
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-# ✨ מריצים את האפליקציה
+# ✨ הרצת האפליקציה
 ENTRYPOINT ["dotnet", "BusuMatchProject.dll"]
