@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+// 👇 הוספת נתיב לספרייה שבה נמצא הקובץ pdfium.dll
+var pdfiumPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+Environment.SetEnvironmentVariable("PATH",
+    Environment.GetEnvironmentVariable("PATH") + ";" + pdfiumPath);
+
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔐 JWT Config
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -33,7 +37,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ CORS: לאפשר גם ל־localhost וגם ל־Render
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -85,7 +88,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// ✅ הפעלת CORS – בשלב מוקדם
 app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
