@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 # 💾 מעתיקים את הקבצים שנבנו
-COPY --from=build /app/out .
+COPY --from=build /app/out . 
 COPY users.db .
 
 # 📦 מתקינים את כל התלויות הדרושות לפעולה של Pdfium ו־Tesseract
@@ -20,15 +20,14 @@ RUN apt-get update && \
     wget \
     poppler-utils \
     ghostscript \
-    && apt-get clean
-
-# 📥 אם ההורדה דרך URL של Pdfium נכשלת, נוודא ש־Pdfium יותקן אוטומטית
-RUN wget https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F6026/pdfium-linux-x64.tgz -O /tmp/pdfium-linux-x64.tgz || \
-    (echo "הורדה נכשלת, מנסה שוב..." && wget https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F6026/pdfium-linux-x64.tgz -O /tmp/pdfium-linux-x64.tgz)
-
-# חצי-גיבוי בהורדה ופתיחה של קובץ Pdfium
-RUN tar -xvzf /tmp/pdfium-linux-x64.tgz -C /usr/lib && \
-    rm -rf /tmp/pdfium-linux-x64.tgz
+    && apt-get install -y \
+    pdfium \
+    # התקנת Tesseract OCR
+    tesseract-ocr \
+    # התקנת תוסף libpng בשביל תמונות
+    libpng-dev \
+    libjpeg-dev && \
+    apt-get clean
 
 # 📌 תמיכה ב-System.Drawing
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
