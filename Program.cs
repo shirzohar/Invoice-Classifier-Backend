@@ -4,14 +4,23 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Runtime.InteropServices; // עבור NativeLibrary
 using System.Text;
 
-// ✅ הוספת נתיב שבו נמצא pdfium.dll (בתיקיית הבסיס של Azure)
-Environment.SetEnvironmentVariable("PATH",
-    Environment.GetEnvironmentVariable("PATH") + ";" + Directory.GetCurrentDirectory());
+// ✅ טעינה מפורשת של pdfium.dll כדי למנוע קריסה ב־Azure
+try
+{
+    string pdfiumPath = Path.Combine(Directory.GetCurrentDirectory(), "pdfium.dll");
+    NativeLibrary.Load(pdfiumPath);
+}
+catch (Exception ex)
+{
+    Console.WriteLine("❌ שגיאה בטעינת pdfium.dll: " + ex.Message);
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 🔐 JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -36,6 +45,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -52,6 +62,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "BusuMatchProject", Version = "v1" });
