@@ -1,0 +1,6 @@
+@BusuMatchProject_HostAddress = http://localhost:5095
+
+GET {{BusuMatchProject_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
