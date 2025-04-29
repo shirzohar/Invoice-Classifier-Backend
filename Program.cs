@@ -88,7 +88,6 @@ var app = builder.Build();
 // ✅ הפעלת CORS – בשלב מוקדם
 app.UseCors("AllowFrontend");
 
-// 📃 Swagger UI רק בפיתוח
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
