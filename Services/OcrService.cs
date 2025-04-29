@@ -1,5 +1,9 @@
 ﻿using Tesseract;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System;
+using System.Text.RegularExpressions;
 
 namespace BusuMatchProject.Services
 {
@@ -12,50 +16,58 @@ namespace BusuMatchProject.Services
 
             if (ext == ".pdf")
             {
-                // Convert PDF to images using pdftoppm
-                string tempOutputPrefix = Path.Combine(Path.GetTempPath(), "output");
+                // Convert PDF to image (first page only)
+                var image = PdfHelper.ConvertPdfToBitmap(path);
 
-                var startInfo = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = "pdftoppm",
-                    Arguments = $"-jpeg \"{path}\" \"{tempOutputPrefix}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+                // Convert to Bitmap if needed
+                if (image is not Bitmap bitmap)
+                    throw new InvalidCastException("Image could not be cast to Bitmap.");
 
-                var process = System.Diagnostics.Process.Start(startInfo);
-                process.WaitForExit();
-
-                var images = Directory.GetFiles(Path.GetTempPath(), "output-*.jpg");
-                if (images.Length == 0)
-                    throw new Exception("Failed to convert PDF to images");
-
-                var extractedText = new List<string>();
-                foreach (var imgPath in images)
-                {
-                    extractedText.Add(RunOcrOnFile(imgPath));
-                    File.Delete(imgPath); // Clean up
-                }
-
-                return string.Join("\n", extractedText);
+                var preprocessed = PreprocessImage(bitmap);
+                return RunOcrOnBitmap(preprocessed);
             }
             else
             {
-                // For images (jpg, png, etc.)
-                return RunOcrOnFile(path);
+                var image = new Bitmap(path);
+                var preprocessed = PreprocessImage(image);
+                return RunOcrOnBitmap(preprocessed);
             }
         }
 
-        // Performs OCR directly on a file using Tesseract
-        private string RunOcrOnFile(string filePath)
+        // Performs OCR using Tesseract on a given bitmap image
+        private string RunOcrOnBitmap(Bitmap bitmap)
         {
             using var engine = new TesseractEngine(@"./tessdata", "heb+eng", EngineMode.Default);
             engine.SetVariable("user_defined_dpi", "300");
-            using var img = Pix.LoadFromFile(filePath);
+            using var img = PixConverter.ToPix(bitmap);
             using var page = engine.Process(img);
             return page.GetText();
+        }
+
+        // Converts an image to grayscale and applies binary thresholding
+        private Bitmap PreprocessImage(Bitmap original)
+        {
+            Bitmap gray = new Bitmap(original.Width, original.Height);
+            for (int y = 0; y < original.Height; y++)
+            {
+                for (int x = 0; x < original.Width; x++)
+                {
+                    Color oc = original.GetPixel(x, y);
+                    int grayValue = (int)(0.3 * oc.R + 0.59 * oc.G + 0.11 * oc.B);
+                    gray.SetPixel(x, y, Color.FromArgb(grayValue, grayValue, grayValue));
+                }
+            }
+
+            for (int y = 0; y < gray.Height; y++)
+            {
+                for (int x = 0; x < gray.Width; x++)
+                {
+                    Color gc = gray.GetPixel(x, y);
+                    gray.SetPixel(x, y, gc.R > 180 ? Color.White : Color.Black);
+                }
+            }
+
+            return gray;
         }
     }
 }
