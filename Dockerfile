@@ -1,7 +1,7 @@
 ﻿# שלב 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
-COPY . .
+COPY . . 
 RUN dotnet publish -c Release -o out
 
 # שלב 2: Run
@@ -20,14 +20,11 @@ RUN apt-get update && \
     wget \
     poppler-utils \
     ghostscript \
-    && apt-get install -y \
-    pdfium \
-    # התקנת Tesseract OCR
     tesseract-ocr \
-    # התקנת תוסף libpng בשביל תמונות
     libpng-dev \
-    libjpeg-dev && \
-    apt-get clean
+    libjpeg-dev \
+    && apt-get install -y pdfium \
+    && apt-get clean
 
 # 📌 תמיכה ב-System.Drawing
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
