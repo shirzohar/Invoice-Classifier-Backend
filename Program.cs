@@ -39,7 +39,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:3003",
+            "http://localhost:3004",
             "https://busymatch-frontend.vercel.app"
         )
         .AllowAnyHeader()
