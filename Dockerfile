@@ -8,25 +8,27 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy AS runtime
 WORKDIR /app
 
-# מעתיקים את תוצרי הבנייה והמסד
+# 💾 מעתיקים את תוצרי הבנייה ואת מסד הנתונים
 COPY --from=build /app/out .
 COPY users.db .
 
-# מתקינים את כל התלויות - הכל ביחד בתוך RUN אחד
+# 📦 מתקינים את כל הספריות הנחוצות
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-heb \
     libtesseract-dev \
     libleptonica-dev \
+    liblept5 \
     libjpeg-dev \
     libpng-dev \
     libgdiplus \
     ghostscript \
     poppler-utils \
-    libc6-dev && apt-get clean
+    libc6-dev && \
+    apt-get clean
 
-# תמיכה ב-System.Drawing
+# 📌 תמיכה ב-System.Drawing
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-# הרצת האפליקציה
+# ✨ מריצים את האפליקציה
 ENTRYPOINT ["dotnet", "BusuMatchProject.dll"]
