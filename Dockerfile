@@ -18,14 +18,16 @@ RUN apt-get update && \
     libc6-dev \
     libpng-dev \
     libjpeg-dev \
-    libleptonica-dev \
+    liblept5 \
     tesseract-ocr \
     tesseract-ocr-heb \
     poppler-utils \
     ghostscript && \
+    # 🛠 תיקון הקריסה של libleptonica
+    ln -s /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/libleptonica-1.80.0.so || true && \
     apt-get clean
 
-# 📌 תמיכה ב-System.Drawing (למרות שאנחנו כבר לא תלויים בו, זה לא מזיק לשים)
+# 📌 תמיכה ב-System.Drawing
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # ✨ מריצים את האפליקציה
