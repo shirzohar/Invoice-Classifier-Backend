@@ -4,27 +4,26 @@ WORKDIR /app
 COPY . .
 RUN dotnet publish -c Release -o out
 
-# שלב 2: Runtime עם Pdfium
+# שלב 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# 📁 מעתיקים את הקבצים שקומפילנו
+# 💾 מעתיקים את הקבצים שנבנו
 COPY --from=build /app/out .
-
-# 💾 מעתיקים את מסד הנתונים
 COPY users.db .
 
-# 📦 מתקינים ספריות תלות של libgdiplus (תמיכה ב־System.Drawing) ו־PDFium
+# 📦 מתקינים ספריות דרושות לתמיכה ב-Tesseract ו-PDF
 RUN apt-get update && \
     apt-get install -y \
-    wget \
     libgdiplus \
     libc6-dev \
+    tesseract-ocr \
+    ghostscript \
+    poppler-utils \
     && apt-get clean
 
-# 📥 מוסיפים את pdfium.dll והגרסה הנייטיבית של libpdfium
-COPY pdfium.dll .
-COPY libpdfium.dll .
+# 📌 מפעילים תמיכה מלאה ב־System.Drawing
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # ✨ מריצים את האפליקציה
 ENTRYPOINT ["dotnet", "BusuMatchProject.dll"]
