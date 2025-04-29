@@ -8,24 +8,24 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# 💾 מעתיקים את הקבצים שנבנו
 COPY --from=build /app/out .
 COPY users.db .
 
-# 📦 מתקינים את כל התלויות הדרושות ל־Tesseract ולעבודה עם תמונות
+# 📦 מתקינים תלויות
 RUN apt-get update && \
     apt-get install -y \
     libgdiplus \
     libc6-dev \
     libpng-dev \
     libjpeg-dev \
-    poppler-utils \
-    ghostscript \
+    libleptonica-dev \
     tesseract-ocr \
-    tesseract-ocr-heb && \
+    tesseract-ocr-heb \
+    poppler-utils \
+    ghostscript && \
     apt-get clean
 
-# 📌 תמיכה ב-System.Drawing
+# 📌 תמיכה ב-System.Drawing (למרות שאנחנו כבר לא תלויים בו, זה לא מזיק לשים)
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # ✨ מריצים את האפליקציה
