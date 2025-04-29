@@ -33,7 +33,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddCors();
+// ✅ CORS: לאפשר גם ל־localhost וגם ל־Render
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:3000",
+            "https://busymatch-frontend.onrender.com"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -70,16 +82,11 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=users.db"));
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReact",
-        policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-});
-
-
 
 var app = builder.Build();
-app.UseCors("AllowReact");
+
+// ✅ הפעלת CORS – בשלב מוקדם
+app.UseCors("AllowFrontend");
 
 // 📃 Swagger UI רק בפיתוח
 if (app.Environment.IsDevelopment())
@@ -90,14 +97,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(policy =>
-    policy.WithOrigins("http://localhost:3000") 
-          .AllowAnyHeader()
-          .AllowAnyMethod()
-);
-
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
