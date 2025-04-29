@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+Environment.SetEnvironmentVariable("PATH",
+    Environment.GetEnvironmentVariable("PATH") + ";C:\\home\\site\\wwwroot");
 
 // 🔐 JWT Config
 var jwtKey = builder.Configuration["Jwt:Key"];
