@@ -57,10 +57,10 @@ namespace BusuMatchProject.Services
 
             using var img = PixConverter.ToPix(bitmap);
             using var page = engine.Process(img);
-
+            Console.WriteLine("check");
             return page.GetText().Trim();
         }
-
+        
         private Bitmap PreprocessImage(Bitmap original)
         {
             // ממיר לגווני אפור
