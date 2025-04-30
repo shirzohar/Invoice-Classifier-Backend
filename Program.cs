@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine("🚀 התחלת טעינת השרת");
 
 // ✅ טעינה מפורשת של pdfium.dll כדי למנוע קריסה ב־Azure
 try
@@ -29,6 +30,7 @@ catch (Exception ex)
     Console.WriteLine("❌ שגיאה בטעינת pdfium.dll: " + ex.Message);
 }
 
+// ✅ JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -53,7 +55,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ CORS: לאפשר גם ל־localhost וגם ל־Render
+// ✅ CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -100,12 +102,42 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddScoped<JwtService>();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=users.db"));
+
+// ✅ קונפיגורציית SQLite עם נתיב בטוח
+try
+{
+    var dbPath = Path.Combine(Environment.CurrentDirectory, "users.db");
+    Console.WriteLine("📂 נתיב למסד הנתונים: " + dbPath);
+    Console.WriteLine("🔍 קובץ קיים? " + File.Exists(dbPath));
+
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlite($"Data Source={dbPath}"));
+}
+catch (Exception ex)
+{
+    Console.WriteLine("❌ שגיאה בהגדרת DB: " + ex.Message);
+}
 
 var app = builder.Build();
 
-// ✅ הפעלת CORS – בשלב מוקדם
+// ✅ הדפסה בזמן Build לבדיקה
+Console.WriteLine("✅ השרת נבנה – ממשיכים להפעלה");
+
+// ✅ בדיקה האם טבלת Users זמינה
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var users = db.Users.ToList();
+        Console.WriteLine($"✅ משתמשים במסד הנתונים: {users.Count}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("❌ שגיאה בגישה ל-Users: " + ex.Message);
+    }
+}
+
 app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
@@ -115,12 +147,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+
+Console.WriteLine("🚀 השרת רץ ומוכן");
 app.Run();
-
-
-
