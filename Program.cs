@@ -83,11 +83,10 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 
-// ✅ קונפיגורציית SQLite עם נתיב בטוח
+// ✅ קונפיגורציית SQLite עם נתיב יציב גם ב־Azure
 try
 {
-    var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "users.db");
-
+    var dbPath = Path.Combine(AppContext.BaseDirectory, "users.db");
     Console.WriteLine("📂 נתיב למסד הנתונים: " + dbPath);
     Console.WriteLine("🔍 קובץ קיים? " + File.Exists(dbPath));
 

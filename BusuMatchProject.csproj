@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Content Include="users.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
     <Content Include="tessdata\**\*">
