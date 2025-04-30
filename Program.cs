@@ -83,10 +83,10 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 
-// ✅ קונפיגורציית SQLite לנתיב בטוח לכתיבה ב־Azure
+// ✅ קונפיגורציית SQLite – users.db ידני בתוך site/wwwroot
 try
 {
-    var dbPath = Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? ".", "site", "data", "users.db");
+    var dbPath = Path.Combine(AppContext.BaseDirectory, "users.db"); // ← זה בדיוק ה־wwwroot
     Console.WriteLine("📂 נתיב למסד הנתונים: " + dbPath);
     Console.WriteLine("🔍 קובץ קיים? " + File.Exists(dbPath));
 
