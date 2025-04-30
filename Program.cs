@@ -86,7 +86,7 @@ builder.Services.AddScoped<JwtService>();
 // ✅ קונפיגורציית SQLite עם נתיב בטוח
 try
 {
-    var dbPath = Path.Combine(Environment.CurrentDirectory, "users.db");
+    var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "users.db");
     Console.WriteLine("📂 נתיב למסד הנתונים: " + dbPath);
     Console.WriteLine("🔍 קובץ קיים? " + File.Exists(dbPath));
 
