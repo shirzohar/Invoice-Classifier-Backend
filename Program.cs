@@ -101,7 +101,6 @@ catch (Exception ex)
 var app = builder.Build();
 
 
-Console.WriteLine("✅ השרת נבנה – ממשיכים להפעלה");
 
 using (var scope = app.Services.CreateScope())
 {
