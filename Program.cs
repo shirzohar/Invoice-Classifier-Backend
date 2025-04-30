@@ -11,10 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 Console.WriteLine("🚀 התחלת טעינת השרת");
 
-// ✅ טעינה מפורשת של pdfium.dll כדי למנוע קריסה ב־Azure
 try
 {
-    string pdfiumPath = Path.Combine(AppContext.BaseDirectory, "pdfium.dll");
+    string pdfiumPath = Path.Combine(Environment.CurrentDirectory, "pdfium.dll");
+
     if (File.Exists(pdfiumPath))
     {
         NativeLibrary.Load(pdfiumPath);
