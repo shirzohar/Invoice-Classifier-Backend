@@ -10,13 +10,22 @@ using System.Text;
 // ✅ טעינה מפורשת של pdfium.dll כדי למנוע קריסה ב־Azure
 try
 {
-    string pdfiumPath = Path.Combine(Directory.GetCurrentDirectory(), "pdfium.dll");
-    NativeLibrary.Load(pdfiumPath);
+    string pdfiumPath = Path.Combine(AppContext.BaseDirectory, "pdfium.dll");
+    if (File.Exists(pdfiumPath))
+    {
+        NativeLibrary.Load(pdfiumPath);
+        Console.WriteLine("✅ pdfium.dll נטען מ־" + pdfiumPath);
+    }
+    else
+    {
+        Console.WriteLine("❌ pdfium.dll לא נמצא ב־" + pdfiumPath);
+    }
 }
 catch (Exception ex)
 {
     Console.WriteLine("❌ שגיאה בטעינת pdfium.dll: " + ex.Message);
 }
+
 
 var builder = WebApplication.CreateBuilder(args);
 
