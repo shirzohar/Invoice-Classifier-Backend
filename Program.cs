@@ -101,23 +101,7 @@ catch (Exception ex)
 
 var app = builder.Build();
 
-// ✅ הדפסה בזמן Build לבדיקה
 Console.WriteLine("✅ השרת נבנה – ממשיכים להפעלה");
-
-// ✅ בדיקה האם טבלת Users זמינה
-using (var scope = app.Services.CreateScope())
-{
-    try
-    {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var users = db.Users.ToList();
-        Console.WriteLine($"✅ משתמשים במסד הנתונים: {users.Count}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("❌ שגיאה בגישה ל-Users: " + ex.Message);
-    }
-}
 
 app.UseCors("AllowFrontend");
 
