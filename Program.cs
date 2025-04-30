@@ -103,7 +103,10 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=users.db"));
+{
+    var dbPath = Path.Combine(AppContext.BaseDirectory, "users.db");
+    options.UseSqlite($"Data Source={dbPath}");
+});
 
 var app = builder.Build();
 
