@@ -1,4 +1,5 @@
-﻿using BusuMatchProject.Data;
+﻿
+using BusuMatchProject.Data;
 using BusuMatchProject.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ CORS
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -83,10 +84,10 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 
-// ✅ קונפיגורציית SQLite – users.db ידני בתוך site/wwwroot
+// ✅ קונפיגורציית SQLite עם נתיב בטוח
 try
 {
-    var dbPath = Path.Combine(AppContext.BaseDirectory, "users.db"); // ← זה בדיוק ה־wwwroot
+    var dbPath = Path.Combine(Environment.CurrentDirectory, "users.db");
     Console.WriteLine("📂 נתיב למסד הנתונים: " + dbPath);
     Console.WriteLine("🔍 קובץ קיים? " + File.Exists(dbPath));
 
@@ -100,7 +101,22 @@ catch (Exception ex)
 
 var app = builder.Build();
 
+
 Console.WriteLine("✅ השרת נבנה – ממשיכים להפעלה");
+
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var users = db.Users.ToList();
+        Console.WriteLine($"✅ משתמשים במסד הנתונים: {users.Count}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("❌ שגיאה בגישה ל-Users: " + ex.Message);
+    }
+}
 
 app.UseCors("AllowFrontend");
 

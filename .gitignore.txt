@@ -13,7 +13,9 @@ x64/
 build/
 *.log
 
-## Ignore secrets
+## Ignore secrets and local config
 appsettings.Development.json
 .env
 
+## Ignore SQLite DB
+users.db
