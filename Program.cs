@@ -9,9 +9,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Console.WriteLine("🚀 התחלת טעינת השרת");
+Console.WriteLine("starting load the server");
 
-// ✅ JWT
+//  JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -84,19 +84,18 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 
-// ✅ קונפיגורציית SQLite עם נתיב בטוח
 try
 {
     var dbPath = Path.Combine(Environment.CurrentDirectory, "users.db");
-    Console.WriteLine("📂 נתיב למסד הנתונים: " + dbPath);
-    Console.WriteLine("🔍 קובץ קיים? " + File.Exists(dbPath));
+    Console.WriteLine("path to db: " + dbPath);
+    Console.WriteLine("file exist " + File.Exists(dbPath));
 
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlite($"Data Source={dbPath}"));
 }
 catch (Exception ex)
 {
-    Console.WriteLine("❌ שגיאה בהגדרת DB: " + ex.Message);
+    Console.WriteLine("error with loading db: " + ex.Message);
 }
 
 var app = builder.Build();
@@ -110,11 +109,11 @@ using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var users = db.Users.ToList();
-        Console.WriteLine($"✅ משתמשים במסד הנתונים: {users.Count}");
+        Console.WriteLine($"use the db: {users.Count}");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("❌ שגיאה בגישה ל-Users: " + ex.Message);
+        Console.WriteLine("accsess error: " + ex.Message);
     }
 }
 
@@ -131,5 +130,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-Console.WriteLine("🚀 השרת רץ ומוכן");
+Console.WriteLine("The server is ready");
 app.Run();
