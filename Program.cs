@@ -4,8 +4,11 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Runtime.InteropServices; // עבור NativeLibrary
 using System.Text;
+using System.Runtime.InteropServices;
+
+var builder = WebApplication.CreateBuilder(args);
+
 
 // ✅ טעינה מפורשת של pdfium.dll כדי למנוע קריסה ב־Azure
 try
@@ -26,10 +29,6 @@ catch (Exception ex)
     Console.WriteLine("❌ שגיאה בטעינת pdfium.dll: " + ex.Message);
 }
 
-
-var builder = WebApplication.CreateBuilder(args);
-
-// 🔐 JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
@@ -54,7 +53,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS
+// ✅ CORS: לאפשר גם ל־localhost וגם ל־Render
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -71,7 +70,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "BusuMatchProject", Version = "v1" });
@@ -103,15 +101,11 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    var dbPath = Path.Combine(Environment.CurrentDirectory, "users.db");
-    Console.WriteLine("📂 DB Path: " + dbPath);
-    Console.WriteLine("🔍 DB Exists: " + File.Exists(dbPath));
-    options.UseSqlite($"Data Source={dbPath}");
-});
+    options.UseSqlite("Data Source=users.db"));
 
 var app = builder.Build();
 
+// ✅ הפעלת CORS – בשלב מוקדם
 app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
@@ -121,8 +115,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
+
+
+
