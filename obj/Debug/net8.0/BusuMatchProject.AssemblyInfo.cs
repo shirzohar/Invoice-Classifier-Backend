@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BusuMatchProject")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+58e9e75bbb0552b576f9ee8dc1a4da419a6f9655")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8adc103534249090ce28a31dc38606f9a3ee468f")]
 [assembly: System.Reflection.AssemblyProductAttribute("BusuMatchProject")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BusuMatchProject")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
