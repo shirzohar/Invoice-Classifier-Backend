@@ -17,7 +17,6 @@ namespace BusuMatchProject.Controllers
         }
 
         // GET: /api/expensese
-        // Returns a filtered list of expenses based on query parameters
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses(
             string? businessName,
@@ -27,49 +26,41 @@ namespace BusuMatchProject.Controllers
             DateTime? fromDate,
             DateTime? toDate)
         {
-            // Start with a queryable collection of all expenses
             var query = _context.Expenses.AsQueryable();
 
-            // Filter by business name (contains, case-sensitive)
             if (!string.IsNullOrWhiteSpace(businessName))
-                query = query.Where(e => e.BusinessName.Contains(businessName));
+                query = query.Where(e => e.BusinessName != null && e.BusinessName.Contains(businessName));
 
-            // Filter by exact category match
             if (!string.IsNullOrWhiteSpace(category))
                 query = query.Where(e => e.Category == category);
 
-            // Filter by minimum total amount
             if (minTotal.HasValue)
-                query = query.Where(e => e.TotalWithVat >= minTotal);
+                query = query.Where(e => e.TotalWithVat.HasValue && e.TotalWithVat >= minTotal);
 
-            // Filter by maximum total amount
             if (maxTotal.HasValue)
-                query = query.Where(e => e.TotalWithVat <= maxTotal);
+                query = query.Where(e => e.TotalWithVat.HasValue && e.TotalWithVat <= maxTotal);
 
-            // Filter by minimum invoice date
             if (fromDate.HasValue)
-                query = query.Where(e => e.InvoiceDate >= fromDate);
+                query = query.Where(e => e.InvoiceDate.HasValue && e.InvoiceDate >= fromDate);
 
-            // Filter by maximum invoice date
             if (toDate.HasValue)
-                query = query.Where(e => e.InvoiceDate <= toDate);
+                query = query.Where(e => e.InvoiceDate.HasValue && e.InvoiceDate <= toDate);
 
-            // Order results by date descending and execute the query
-            return await query.OrderByDescending(e => e.InvoiceDate).ToListAsync();
+            return await query
+                .OrderByDescending(e => e.InvoiceDate ?? DateTime.MinValue)
+                .ToListAsync();
         }
 
         // POST: /api/expensese
-        // Adds a new expense to the database
         [HttpPost]
         public async Task<IActionResult> AddExpense([FromBody] Expense expense)
         {
-            // Add the new expense to the context
-            _context.Expenses.Add(expense);
+            if (expense == null)
+                return BadRequest("Expense is null");
 
-            // Save changes to the database asynchronously
+            _context.Expenses.Add(expense);
             await _context.SaveChangesAsync();
 
-            // Return 201 Created with location of the new resource
             return CreatedAtAction(nameof(GetExpenses), new { id = expense.Id }, expense);
         }
     }
