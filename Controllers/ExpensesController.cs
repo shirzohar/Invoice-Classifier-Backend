@@ -31,25 +31,25 @@ namespace BusuMatchProject.Controllers
 
             var query = _context.Expenses.Where(e => e.UserId == userId).AsQueryable();
 
-            if (!string.IsNullOrEmpty(name))
-                query = query.Where(e => e.BusinessName.Contains(name));
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(e => e.BusinessName != null && e.BusinessName.Contains(name));
 
-            if (!string.IsNullOrEmpty(category))
+            if (!string.IsNullOrWhiteSpace(category))
                 query = query.Where(e => e.Category == category);
 
             if (min.HasValue)
-                query = query.Where(e => e.TotalWithVat >= min);
+                query = query.Where(e => e.TotalWithVat.HasValue && e.TotalWithVat >= min);
 
             if (max.HasValue)
-                query = query.Where(e => e.TotalWithVat <= max);
+                query = query.Where(e => e.TotalWithVat.HasValue && e.TotalWithVat <= max);
 
             if (from.HasValue)
-                query = query.Where(e => e.InvoiceDate >= from);
+                query = query.Where(e => e.InvoiceDate.HasValue && e.InvoiceDate >= from);
 
             if (to.HasValue)
-                query = query.Where(e => e.InvoiceDate <= to);
+                query = query.Where(e => e.InvoiceDate.HasValue && e.InvoiceDate <= to);
 
-            var results = await query.OrderByDescending(e => e.InvoiceDate).ToListAsync();
+            var results = await query.OrderByDescending(e => e.InvoiceDate ?? DateTime.MinValue).ToListAsync();
             return Ok(results);
         }
 
