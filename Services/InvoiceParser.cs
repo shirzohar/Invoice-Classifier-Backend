@@ -1,8 +1,6 @@
 ﻿using BusuMatchProject.Models;
 using System.Text.RegularExpressions;
 
-using BusuMatchProject.Models;
-using System.Text.RegularExpressions;
 
 namespace BusuMatchProject.Services
 {

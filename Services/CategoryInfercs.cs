@@ -4,36 +4,41 @@ namespace BusuMatchProject.Services
 {
     public class CategoryInfercs
     {
-
-        public static string LoadCategories(string FilePath)
+        public static string LoadCategories(string filePath, string textToMatch)
         {
-            if (!File.Exists(FilePath))
-            {
+            if (!File.Exists(filePath))
                 return "error";
-            }
 
-            var text = File.ReadAllText(FilePath);
-            var categories = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(text);
+            var json = File.ReadAllText(filePath);
 
-            foreach (var category in categories)
+            try
             {
-                var categoryName = category["category"]?.ToString();
-                var keyWords = JsonSerializer.Deserialize<string>("keyword");
-                if (keyWords != null)
+                var categories = JsonSerializer.Deserialize<List<CategoryItem>>(json);
+                if (categories == null) return "other";
+
+                foreach (var category in categories)
                 {
-                    foreach (var keyword in keyWords)
+                    foreach (var keyword in category.Keywords)
                     {
-                        if (text.Contains(keyword, StringComparison.OrdinalIgnoreCase)){
-                            return categoryName;
+                        if (textToMatch.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return category.Category;
                         }
                     }
                 }
 
-
-
+                return "other";
             }
-            return "other";
+            catch
+            {
+                return "error";
+            }
+        }
+
+        private class CategoryItem
+        {
+            public string Category { get; set; } = string.Empty;
+            public List<string> Keywords { get; set; } = new();
         }
     }
-
 }
