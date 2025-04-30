@@ -14,7 +14,6 @@
           "Microsoft.EntityFrameworkCore.Sqlite": "9.0.4",
           "Microsoft.EntityFrameworkCore.Tools": "9.0.4",
           "PdfiumViewer": "2.13.0",
-          "PdfiumViewer.Native.x86_64.no_v8-no_xfa": "2018.4.8.256",
           "Swashbuckle.AspNetCore": "6.4.0",
           "System.Drawing.Common": "6.0.0",
           "System.IdentityModel.Tokens.Jwt": "8.8.0",
@@ -870,7 +869,6 @@
           }
         }
       },
-      "PdfiumViewer.Native.x86_64.no_v8-no_xfa/2018.4.8.256": {},
       "runtime.native.System/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.1",
@@ -1694,13 +1692,6 @@
       "sha512": "sha512-Nw4owBmJzDVXoMRjCnqPbET07CPOawwhcNjt+PyRaSxONN9bsFF+cm9kcMsDLEAEaxsiDJo5jls8bCQjvjidkA==",
       "path": "pdfiumviewer/2.13.0",
       "hashPath": "pdfiumviewer.2.13.0.nupkg.sha512"
-    },
-    "PdfiumViewer.Native.x86_64.no_v8-no_xfa/2018.4.8.256": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-Vc5TY9nc6oYDzsC4gWIjIZGbUDXBPF++HzIlg5HsC7Pa0SsPgjXH2UIwfY6YcbAhwbf11NuXrBCNzgKYvPXSfw==",
-      "path": "pdfiumviewer.native.x86_64.no_v8-no_xfa/2018.4.8.256",
-      "hashPath": "pdfiumviewer.native.x86_64.no_v8-no_xfa.2018.4.8.256.nupkg.sha512"
     },
     "runtime.native.System/4.3.0": {
       "type": "package",

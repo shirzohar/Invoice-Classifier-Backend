@@ -72,10 +72,6 @@
               "target": "Package",
               "version": "[2.13.0, )"
             },
-            "PdfiumViewer.Native.x86_64.no_v8-no_xfa": {
-              "target": "Package",
-              "version": "[2018.4.8.256, )"
-            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"

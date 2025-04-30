@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Q6sdNGiTY3s=",
+  "dgSpecHash": "D1nRbcHImZw=",
   "success": true,
   "projectFilePath": "C:\\Users\\shir3\\source\\repos\\BusuMatchProject\\BusuMatchProject\\BusuMatchProject.csproj",
   "expectedPackageFiles": [
@@ -53,7 +53,6 @@
     "C:\\Users\\shir3\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\shir3\\.nuget\\packages\\mono.texttemplating\\3.0.0\\mono.texttemplating.3.0.0.nupkg.sha512",
     "C:\\Users\\shir3\\.nuget\\packages\\pdfiumviewer\\2.13.0\\pdfiumviewer.2.13.0.nupkg.sha512",
-    "C:\\Users\\shir3\\.nuget\\packages\\pdfiumviewer.native.x86_64.no_v8-no_xfa\\2018.4.8.256\\pdfiumviewer.native.x86_64.no_v8-no_xfa.2018.4.8.256.nupkg.sha512",
     "C:\\Users\\shir3\\.nuget\\packages\\runtime.native.system\\4.3.0\\runtime.native.system.4.3.0.nupkg.sha512",
     "C:\\Users\\shir3\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.10\\sqlitepclraw.bundle_e_sqlite3.2.1.10.nupkg.sha512",
     "C:\\Users\\shir3\\.nuget\\packages\\sqlitepclraw.core\\2.1.10\\sqlitepclraw.core.2.1.10.nupkg.sha512",
