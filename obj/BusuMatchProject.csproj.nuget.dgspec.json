@@ -54,6 +54,10 @@
               "target": "Package",
               "version": "[4.10.0.5680, )"
             },
+            "Magick.NET-Q8-AnyCPU": {
+              "target": "Package",
+              "version": "[13.6.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[8.0.4, )"
@@ -67,10 +71,6 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[9.0.4, )"
-            },
-            "PdfiumViewer": {
-              "target": "Package",
-              "version": "[2.13.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

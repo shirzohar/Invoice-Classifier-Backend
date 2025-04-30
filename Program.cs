@@ -5,30 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Console.WriteLine("🚀 התחלת טעינת השרת");
-
-try
-{
-    string pdfiumPath = Path.Combine(Environment.CurrentDirectory, "pdfium.dll");
-
-    if (File.Exists(pdfiumPath))
-    {
-        NativeLibrary.Load(pdfiumPath);
-        Console.WriteLine("✅ pdfium.dll נטען מ־" + pdfiumPath);
-    }
-    else
-    {
-        Console.WriteLine("❌ pdfium.dll לא נמצא ב־" + pdfiumPath);
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine("❌ שגיאה בטעינת pdfium.dll: " + ex.Message);
-}
 
 // ✅ JWT
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -61,7 +41,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:3004",
+            "http://localhost:3005",
             "https://busymatch-frontend.vercel.app"
         )
         .AllowAnyHeader()

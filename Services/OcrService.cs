@@ -1,69 +1,87 @@
 ﻿using Tesseract;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System;
-using System.Text.RegularExpressions;
 
 namespace BusuMatchProject.Services
 {
     public class OcrService
     {
-        // Main method to extract text from a file (PDF or image)
         public string ExtractTextFromFile(string path)
         {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                throw new FileNotFoundException("הקובץ לא נמצא או הנתיב לא תקין", path);
+
             var ext = Path.GetExtension(path).ToLower();
 
-            if (ext == ".pdf")
+            Bitmap bitmap;
+
+            try
             {
-                // Convert PDF to image (first page only)
-                var image = PdfHelper.ConvertPdfToBitmap(path);
+                if (ext == ".pdf")
+                {
+                    // ממיר PDF לתמונה – רק העמוד הראשון
+                    bitmap = PdfHelper.ConvertPdfToBitmap(path);
+                }
+                else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".bmp" || ext == ".tif" || ext == ".tiff")
+                {
+                    // טעינה ישירה של תמונה
+                    using var original = new Bitmap(path);
+                    bitmap = new Bitmap(original); // יוצר עותק למניעת נעילה
+                }
+                else
+                {
+                    throw new NotSupportedException($"סוג קובץ לא נתמך: {ext}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"שגיאה בטעינת תמונה או המרת PDF: {ex.Message}");
+            }
 
-                // Convert to Bitmap if needed
-                if (image is not Bitmap bitmap)
-                    throw new InvalidCastException("Image could not be cast to Bitmap.");
-
+            try
+            {
                 var preprocessed = PreprocessImage(bitmap);
                 return RunOcrOnBitmap(preprocessed);
             }
-            else
+            finally
             {
-                var image = new Bitmap(path);
-                var preprocessed = PreprocessImage(image);
-                return RunOcrOnBitmap(preprocessed);
+                bitmap.Dispose();
             }
         }
 
-        // Performs OCR using Tesseract on a given bitmap image
         private string RunOcrOnBitmap(Bitmap bitmap)
         {
             using var engine = new TesseractEngine(@"./tessdata", "heb+eng", EngineMode.Default);
             engine.SetVariable("user_defined_dpi", "300");
+
             using var img = PixConverter.ToPix(bitmap);
             using var page = engine.Process(img);
-            return page.GetText();
+
+            return page.GetText().Trim();
         }
 
-        // Converts an image to grayscale and applies binary thresholding
         private Bitmap PreprocessImage(Bitmap original)
         {
+            // ממיר לגווני אפור
             Bitmap gray = new Bitmap(original.Width, original.Height);
             for (int y = 0; y < original.Height; y++)
             {
                 for (int x = 0; x < original.Width; x++)
                 {
-                    Color oc = original.GetPixel(x, y);
-                    int grayValue = (int)(0.3 * oc.R + 0.59 * oc.G + 0.11 * oc.B);
+                    var pixel = original.GetPixel(x, y);
+                    int grayValue = (int)(0.3 * pixel.R + 0.59 * pixel.G + 0.11 * pixel.B);
                     gray.SetPixel(x, y, Color.FromArgb(grayValue, grayValue, grayValue));
                 }
             }
 
+            // סף בינארי (threshold)
             for (int y = 0; y < gray.Height; y++)
             {
                 for (int x = 0; x < gray.Width; x++)
                 {
-                    Color gc = gray.GetPixel(x, y);
-                    gray.SetPixel(x, y, gc.R > 180 ? Color.White : Color.Black);
+                    var pixel = gray.GetPixel(x, y);
+                    gray.SetPixel(x, y, pixel.R > 180 ? Color.White : Color.Black);
                 }
             }
 

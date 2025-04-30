@@ -31,8 +31,10 @@ namespace BusuMatchProject.Controllers
             if (!Directory.Exists(uploadsPath))
                 Directory.CreateDirectory(uploadsPath);
 
-            // Save uploaded file locally
-            var filePath = Path.Combine(uploadsPath, file.FileName);
+            // ✅ Save with unique name to avoid collisions
+            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsPath, uniqueFileName);
+
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
@@ -66,7 +68,7 @@ namespace BusuMatchProject.Controllers
                     TotalWithVat = decimal.TryParse(parsed.TotalWithVat, out var withVat) ? withVat : (decimal?)null,
                     Category = string.IsNullOrWhiteSpace(parsed.Category) ? "לא מסווג" : parsed.Category,
                     CreatedAt = DateTime.UtcNow,
-                    UserId = userId //  Link expense to the logged-in user
+                    UserId = userId // Link expense to the logged-in user
                 };
 
                 // Save expense to database
@@ -77,8 +79,13 @@ namespace BusuMatchProject.Controllers
             }
             catch (Exception ex)
             {
-                // Catch all errors from OCR, parsing or DB and return a generic error
                 return StatusCode(500, $"OCR or Parsing failed: {ex.InnerException?.Message ?? ex.Message}");
+            }
+            finally
+            {
+                // ✅ Clean up temporary file
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
             }
         }
     }
