@@ -46,14 +46,6 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "Emgu.CV": {
-              "target": "Package",
-              "version": "[4.10.0.5680, )"
-            },
-            "Emgu.CV.runtime.windows": {
-              "target": "Package",
-              "version": "[4.10.0.5680, )"
-            },
             "Magick.NET-Q8-AnyCPU": {
               "target": "Package",
               "version": "[13.6.0, )"
@@ -75,10 +67,6 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
-            },
-            "System.Drawing.Common": {
-              "target": "Package",
-              "version": "[6.0.0, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",

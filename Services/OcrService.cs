@@ -1,5 +1,5 @@
 ﻿using Tesseract;
-using System.Drawing;
+using ImageMagick;
 using System.IO;
 using System;
 
@@ -13,21 +13,17 @@ namespace BusuMatchProject.Services
                 throw new FileNotFoundException("הקובץ לא נמצא או הנתיב לא תקין", path);
 
             var ext = Path.GetExtension(path).ToLower();
-
-            Bitmap bitmap;
+            MagickImage image;
 
             try
             {
                 if (ext == ".pdf")
                 {
-                    // ממיר PDF לתמונה – רק העמוד הראשון
-                    bitmap = PdfHelper.ConvertPdfToBitmap(path);
+                    image = PdfHelper.ConvertPdfToMagickImage(path);
                 }
                 else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".bmp" || ext == ".tif" || ext == ".tiff")
                 {
-                    // טעינה ישירה של תמונה
-                    using var original = new Bitmap(path);
-                    bitmap = new Bitmap(original); // יוצר עותק למניעת נעילה
+                    image = new MagickImage(path);
                 }
                 else
                 {
@@ -41,51 +37,40 @@ namespace BusuMatchProject.Services
 
             try
             {
-                var preprocessed = PreprocessImage(bitmap);
-                return RunOcrOnBitmap(preprocessed);
+                var preprocessed = PreprocessImage(image);
+                return RunOcrOnMagickImage(preprocessed);
             }
             finally
             {
-                bitmap.Dispose();
+                image?.Dispose();
             }
         }
 
-        private string RunOcrOnBitmap(Bitmap bitmap)
+        private string RunOcrOnMagickImage(MagickImage image)
         {
             using var engine = new TesseractEngine(@"./tessdata", "heb+eng", EngineMode.Default);
             engine.SetVariable("user_defined_dpi", "300");
 
-            using var img = PixConverter.ToPix(bitmap);
-            using var page = engine.Process(img);
-            Console.WriteLine("check");
+            using var stream = new MemoryStream();
+            image.Format = MagickFormat.Bmp;
+            image.Write(stream);
+            stream.Position = 0;
+
+            using var pix = Pix.LoadFromMemory(stream.ToArray());
+            using var page = engine.Process(pix);
+
             return page.GetText().Trim();
         }
-        
-        private Bitmap PreprocessImage(Bitmap original)
+
+        private MagickImage PreprocessImage(MagickImage image)
         {
-            // ממיר לגווני אפור
-            Bitmap gray = new Bitmap(original.Width, original.Height);
-            for (int y = 0; y < original.Height; y++)
-            {
-                for (int x = 0; x < original.Width; x++)
-                {
-                    var pixel = original.GetPixel(x, y);
-                    int grayValue = (int)(0.3 * pixel.R + 0.59 * pixel.G + 0.11 * pixel.B);
-                    gray.SetPixel(x, y, Color.FromArgb(grayValue, grayValue, grayValue));
-                }
-            }
+            var processed = (MagickImage)image.Clone(); // ✅ המרה מפורשת
 
-            // סף בינארי (threshold)
-            for (int y = 0; y < gray.Height; y++)
-            {
-                for (int x = 0; x < gray.Width; x++)
-                {
-                    var pixel = gray.GetPixel(x, y);
-                    gray.SetPixel(x, y, pixel.R > 180 ? Color.White : Color.Black);
-                }
-            }
+            processed.ColorType = ColorType.Grayscale;
+            processed.Threshold(new Percentage(70)); // בינאריזציה פשוטה
 
-            return gray;
+            return processed;
         }
+
     }
 }
